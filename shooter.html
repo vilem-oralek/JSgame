@@ -38,8 +38,8 @@
     </style>
 </head>
 <body onclick="shot()">
-    <div class="object" id="ally" onclick="wrongTarget()"></div>
-    <div class="object" id="enemy" onclick="rightTarget()"></div>
+    <div class="object" id="ally" onclick="targetShot(this)"></div>
+    <div class="object" id="enemy" onclick="targetShot(this)"></div>
     <div id="score">score: 0</div>
     <script>
 
@@ -49,15 +49,14 @@
         var ally = document.getElementById("ally");
         var enemy = document.getElementById("enemy");
 
-        function rightTarget(){
-            score += 5;
+        function targetShot(element){
+            if (element.id === "enemy") {
+                score += 5;
+            } else if (element.id === "ally") {
+                score -= 5;
+            }
             document.getElementById("score").innerHTML = "score: " + score;
-            spawn(enemy);
-        }
-        function wrongTarget(){
-            score -= 5;
-            document.getElementById("score").innerHTML = "score: " + score;
-            spawn(ally);
+            spawn(element);
         }
         function shot(){
             new Audio("gunshot.mp3").play();
