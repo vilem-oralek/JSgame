@@ -2,40 +2,7 @@
 <html>
 <head>
 <title>SHOOTER</title>
-    <script>
-    
-    </script>
-    <style>
-        .object{
-            height: 200px;
-            width: 200px;
-            border-radius: 50%;
-            position: absolute;
-            top: 300px;
-            left: 600px;
-        }
-        html{
-            height: 100%;
-        }
-        body{
-            height: 100%;
-            background-color: grey;
-            display: flex;
-            cursor: crosshair;
-        }
-        #enemy{
-            background-color: black;
-        }
-        #ally{
-            background-color: white;
-        }
-        #score{
-            width: fit-content;
-            height: 50px;
-            font-size: 22px;
-
-        }
-    </style>
+<link rel="stylesheet" href="shooter.css">
 </head>
 <body onclick="shot()">
     <div class="object" id="ally" onclick="targetShot(this)"></div>
@@ -67,6 +34,7 @@
             element.style.left = Math.floor(Math.random() * w) + "px";
             element.style.top = Math.floor(Math.random() * h) + "px";
         }
+
         spawn(ally);
         spawn(enemy);
 
