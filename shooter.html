@@ -10,6 +10,9 @@
             height: 200px;
             width: 200px;
             border-radius: 50%;
+            position: absolute;
+            top: 300px;
+            left: 600px;
         }
         html{
             height: 100%;
@@ -17,6 +20,7 @@
         body{
             height: 100%;
             background-color: grey;
+            display: flex;
         }
         #enemy{
             background-color: black;
@@ -25,21 +29,21 @@
             background-color: white;
         }
         #score{
-            width: 50px;
+            width: fit-content;
             height: 50px;
+            font-size: 22px;
+
         }
     </style>
 </head>
 <body>
     <div class="object" id="ally" onclick="wrongTarget()"></div>
     <div class="object" id="enemy" onclick="rightTarget()"></div>
-    <div id="score">score: </div>
+    <div id="score">score: 0</div>
     <script>
-
         
-
-        var w = window.innerWidth;
-        var h = window.innerHeight;
+        var w = window.innerWidth - 200;
+        var h = window.innerHeight - 200;
         var score = 0;
         var ally = document.getElementById("ally");
         var enemy = document.getElementById("enemy");
@@ -47,11 +51,21 @@
         function rightTarget(){
             score += 5;
             document.getElementById("score").innerHTML = "score: " + score;
+            spawn(enemy);
         }
         function wrongTarget(){
             score -= 5;
             document.getElementById("score").innerHTML = "score: " + score;
+            spawn(ally);
         }
+        function movement(){
+        }
+        function spawn(element){
+            element.style.left = Math.floor(Math.random() * w) + "px";
+            element.style.top = Math.floor(Math.random() * h) + "px";
+        }
+        spawn(ally);
+        spawn(enemy);
 
     </script>
 </body>
