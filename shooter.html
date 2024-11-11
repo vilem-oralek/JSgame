@@ -21,6 +21,7 @@
             height: 100%;
             background-color: grey;
             display: flex;
+            cursor: crosshair;
         }
         #enemy{
             background-color: black;
@@ -36,12 +37,12 @@
         }
     </style>
 </head>
-<body>
+<body onclick="shot()">
     <div class="object" id="ally" onclick="wrongTarget()"></div>
     <div class="object" id="enemy" onclick="rightTarget()"></div>
     <div id="score">score: 0</div>
     <script>
-        
+
         var w = window.innerWidth - 200;
         var h = window.innerHeight - 200;
         var score = 0;
@@ -57,6 +58,9 @@
             score -= 5;
             document.getElementById("score").innerHTML = "score: " + score;
             spawn(ally);
+        }
+        function shot(){
+            new Audio("gunshot.mp3").play();
         }
         function movement(){
         }
