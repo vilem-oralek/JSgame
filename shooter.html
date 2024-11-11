@@ -3,12 +3,13 @@
 <head>
 <title>SHOOTER</title>
     <script>
+    
     </script>
     <style>
         .object{
             height: 200px;
             width: 200px;
-            background-color: black;
+            border-radius: 50%;
         }
         html{
             height: 100%;
@@ -17,11 +18,41 @@
             height: 100%;
             background-color: grey;
         }
+        #enemy{
+            background-color: black;
+        }
+        #ally{
+            background-color: white;
+        }
+        #score{
+            width: 50px;
+            height: 50px;
+        }
     </style>
 </head>
 <body>
-    <div class="object"></div>
+    <div class="object" id="ally" onclick="wrongTarget()"></div>
+    <div class="object" id="enemy" onclick="rightTarget()"></div>
+    <div id="score">score: </div>
     <script>
+
+        
+
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        var score = 0;
+        var ally = document.getElementById("ally");
+        var enemy = document.getElementById("enemy");
+
+        function rightTarget(){
+            score += 5;
+            document.getElementById("score").innerHTML = "score: " + score;
+        }
+        function wrongTarget(){
+            score -= 5;
+            document.getElementById("score").innerHTML = "score: " + score;
+        }
+
     </script>
 </body>
 </html>
