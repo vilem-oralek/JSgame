@@ -28,7 +28,21 @@
         function shot(){
             new Audio("gunshot.mp3").play();
         }
-        function movement(){
+        function movement(element){
+            var dx = 2;
+            let myInterval = setInterval(function(){
+                var x = parseInt(element.style.left);
+                var y = element.style.top;
+
+                if(x > w){
+                    dx = -dx;
+                }
+                else if (x < 0){
+                    dx = -dx;
+                }
+
+                element.style.left = x + dx + "px";
+            }, 20);
         }
         function spawn(element){
             element.style.left = Math.floor(Math.random() * w) + "px";
@@ -37,7 +51,8 @@
 
         spawn(ally);
         spawn(enemy);
-
+        movement(ally);
+        movement(enemy);
     </script>
 </body>
 </html>
