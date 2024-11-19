@@ -8,6 +8,7 @@
     <div class="object" id="ally" onclick="targetShot(this)"></div>
     <div class="object" id="enemy" onclick="targetShot(this)"></div>
     <div id="score">score: 0</div>
+    <div id="reload-message">RELOADING...</div>
     <script>
 
         var w = window.innerWidth - 200;
@@ -15,21 +16,40 @@
         var score = 0;
         var ally = document.getElementById("ally");
         var enemy = document.getElementById("enemy");
+        var reloadMessage = document.getElementById("reload-message");
+        var isReloading = false;
+        var reloadTime = 1000;
 
         function targetShot(element){
-            if (element.id === "enemy") {
+            if (isReloading){
+                return;
+            } else if (element.id === "enemy") {
                 score += 5;
             } else if (element.id === "ally") {
                 score -= 5;
             }
             document.getElementById("score").innerHTML = "score: " + score;
             spawn(element);
+            shot();
+            reload();
+        }
+        function reload() {
+            isReloading = true;
+            reloadMessage.style.display = "block";
+            setTimeout(() => {
+                reloadMessage.style.display = "none";
+                isReloading = false;
+            }, reloadTime);
         }
         function shot(){
-            new Audio("gunshot.mp3").play();
+            if (!isReloading){
+              new Audio("gunshot.mp3").play();  
+              reload();
+            } 
         }
+
         function movement(element){
-            var dx = 2;
+            var dx = 6;
             let myInterval = setInterval(function(){
                 var x = parseInt(element.style.left);
                 var y = element.style.top;

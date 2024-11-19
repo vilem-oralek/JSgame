@@ -14,6 +14,7 @@ body{
     background-color: grey;
     display: flex;
     cursor: crosshair;
+    overflow: hidden;
 }
 #enemy{
     background-color: black;
@@ -25,4 +26,14 @@ body{
     width: fit-content;
     height: 50px;
     font-size: 22px;
+    color: white;
+}
+#reload-message {
+    width: 100%;
+    text-align: center;
+    position: fixed;
+    bottom: 20px;
+    font-size: 22px;
+    color: white;
+    display: none;
 }
