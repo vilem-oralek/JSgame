@@ -15,6 +15,8 @@ body{
     display: flex;
     cursor: crosshair;
     overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
 }
 #enemy{
     background-color: black;
@@ -22,11 +24,11 @@ body{
 #ally{
     background-color: white;
 }
-#score{
-    width: fit-content;
-    height: 50px;
+.stats{
+    flex-direction: column;
     font-size: 22px;
     color: white;
+    padding: 10px;
 }
 #reload-message {
     width: 100%;

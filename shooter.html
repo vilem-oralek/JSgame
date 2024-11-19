@@ -7,7 +7,10 @@
 <body onclick="shot()">
     <div class="object" id="ally" onclick="targetShot(this)"></div>
     <div class="object" id="enemy" onclick="targetShot(this)"></div>
-    <div id="score">score: 0</div>
+    <div class="stats">
+        <div id="score">score: 0</div>
+        <div id="ammo"></div>    
+    </div>
     <div id="reload-message">RELOADING...</div>
     <script>
 
@@ -19,6 +22,9 @@
         var reloadMessage = document.getElementById("reload-message");
         var isReloading = false;
         var reloadTime = 1000;
+        var setAmmo = 3;
+        var ammo = 3;
+        var element = document.documentElement;
 
         function targetShot(element){
             if (isReloading){
@@ -30,22 +36,27 @@
             }
             document.getElementById("score").innerHTML = "score: " + score;
             spawn(element);
-            shot();
-            reload();
         }
         function reload() {
             isReloading = true;
             reloadMessage.style.display = "block";
             setTimeout(() => {
                 reloadMessage.style.display = "none";
+                ammo = setAmmo;
+                document.getElementById("ammo").innerHTML = "ammo: " + ammo;
                 isReloading = false;
             }, reloadTime);
         }
         function shot(){
-            if (!isReloading){
-              new Audio("gunshot.mp3").play();  
-              reload();
-            } 
+            if (!isReloading && ammo > 0){
+                new Audio("gunshot.mp3").play();
+                ammo--;
+                document.getElementById("ammo").innerHTML = "ammo: " + ammo;
+
+                if (ammo === 0){
+                    reload();
+                }
+            }
         }
 
         function movement(element){
@@ -54,12 +65,7 @@
                 var x = parseInt(element.style.left);
                 var y = element.style.top;
 
-                if(x > w){
-                    dx = -dx;
-                }
-                else if (x < 0){
-                    dx = -dx;
-                }
+                if(x > w || x < 0) dx = -dx;
 
                 element.style.left = x + dx + "px";
             }, 20);
@@ -69,10 +75,26 @@
             element.style.top = Math.floor(Math.random() * h) + "px";
         }
 
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'f' || event.key === 'F') {
+                if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.mozRequestFullScreen) { // Firefox
+                element.mozRequestFullScreen();
+            } else if (element.webkitRequestFullscreen) { // Chrome, Safari and Opera
+                element.webkitRequestFullscreen();
+            } else if (element.msRequestFullscreen) { // IE/Edge
+                element.msRequestFullscreen();
+            }
+            }
+        });
+
         spawn(ally);
         spawn(enemy);
         movement(ally);
         movement(enemy);
+        document.getElementById("ammo").innerHTML = "ammo: " + ammo;
+
     </script>
 </body>
 </html>
