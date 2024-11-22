@@ -1,10 +1,10 @@
 .object{
-    height: 200px;
-    width: 200px;
+    height: 180px;
+    width: 180px;
     border-radius: 50%;
     position: absolute;
-    top: 300px;
-    left: 600px;
+    top: 0;
+    left: 0;
 }
 html, body{
     height: 100%;
@@ -16,6 +16,14 @@ body{
     overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
+}
+#start-button{
+    padding: 25px;
+    font-size: 15px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 #enemy{
     background-color: black;
@@ -55,10 +63,12 @@ body{
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: rgb(114, 53, 255);
-    background-color: rgb(100, 10, 90, 0.7);
-    font-size: 30px;
+    color: rgb(120, 35, 205);
+    background-color: rgba(99, 3, 91, 0.7);
+    font-size: 40px;
+    text-shadow: -1.5px -1.5px 0 black, 1.5px -1.5px 0 black, -1.5px 1.5px 0 black, 1.5px 1.5px 0 black; /* black outline */
     border: 3px dashed black;
+    z-index: 10;
 }
 #upgrade-container{
     height: 100%;
@@ -68,4 +78,9 @@ body{
     justify-content: center;
     flex-direction: row;
     z-index: 5;
+}
+#game-container {
+    display: none;
+    height: 100%;
+    width: 100%;
 }
