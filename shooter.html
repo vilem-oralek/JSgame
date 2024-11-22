@@ -8,7 +8,13 @@
     <div class="object" id="ally" onclick="targetShot(this)"></div>
     <div class="object" id="enemy" onclick="targetShot(this)"></div>
     <div class="object" id="enemy-gold" onclick="targetShot(this)"></div>
-    <div class="stats">
+    <div id="upgrade-container">
+       <div class="upgrade-button" id="multiplyer">get more points/time from enemies</div>
+        <div class="upgrade-button" id="ammo-count">+1 bullet</div>
+        <div class="upgrade-button" id="reload-time">shorter reload time</div> 
+    </div>
+    
+    <div id="stats">
         <div id="score">score: 0</div>
         <div id="ammo"></div>    
     </div>
@@ -90,10 +96,26 @@
         }
 
         function stopAllMovement() {
-            for (let key in intervals) {
-                clearInterval(intervals[key]); // Stop all intervals
+            for (let ID in intervals) {
+                clearInterval(intervals[ID]); // Stop all intervals
             }
             isPaused = true;
+            document.getElementById("multiplyer").style.display = "flex";
+            document.getElementById("ammo-count").style.display = "flex";
+            document.getElementById("reload-time").style.display = "flex";
+            document.getElementById("upgrade-container").style.display = "flex";
+            document.getElementById("stats").style.display = "none";
+        }
+        function resumeAllMovement() {
+            movement(ally);
+                    movement(enemy);
+                    movement(enemyGold);
+                    document.getElementById("multiplyer").style.display = "none";
+                    document.getElementById("ammo-count").style.display = "none";
+                    document.getElementById("reload-time").style.display = "none";
+                    document.getElementById("upgrade-container").style.display = "none";
+                    document.getElementById("stats").style.display = "block";
+                    isPaused = false
         }
 
         function spawn(element){
@@ -119,11 +141,11 @@
                     stopAllMovement();
                 }
                 else{
-                    movement(ally);
-                    movement(enemy);
-                    movement(enemyGold);
-                    isPaused = false
+                    resumeAllMovement();
                 }
+            }
+            else if (event.key === 'r' || event.key === 'R'){
+                reload();
             }
         });
 

@@ -6,11 +6,10 @@
     top: 300px;
     left: 600px;
 }
-html{
+html, body{
     height: 100%;
 }
 body{
-    height: 100%;
     background-color: grey;
     display: flex;
     cursor: crosshair;
@@ -20,16 +19,19 @@ body{
 }
 #enemy{
     background-color: black;
+    z-index: 1;
 }
 #enemy-gold{
     background-color: gold;
     width: 40px;
     height: 40px;
+    z-index: 3;
 }
 #ally{
     background-color: white;
+    z-index: 2;
 }
-.stats{
+#stats{
     flex-direction: column;
     font-size: 22px;
     color: white;
@@ -43,4 +45,27 @@ body{
     font-size: 22px;
     color: white;
     display: none;
+}
+.upgrade-button{
+    height: 250px;
+    width: 250px;
+    padding: 30px;
+    margin: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: rgb(114, 53, 255);
+    background-color: rgb(100, 10, 90, 0.7);
+    font-size: 30px;
+    border: 3px dashed black;
+}
+#upgrade-container{
+    height: 100%;
+    width: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    z-index: 5;
 }
