@@ -21,6 +21,11 @@ body{
 #enemy{
     background-color: black;
 }
+#enemy-gold{
+    background-color: gold;
+    width: 40px;
+    height: 40px;
+}
 #ally{
     background-color: white;
 }

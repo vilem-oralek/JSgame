@@ -7,30 +7,37 @@
 <body onclick="shot()">
     <div class="object" id="ally" onclick="targetShot(this)"></div>
     <div class="object" id="enemy" onclick="targetShot(this)"></div>
+    <div class="object" id="enemy-gold" onclick="targetShot(this)"></div>
     <div class="stats">
         <div id="score">score: 0</div>
         <div id="ammo"></div>    
     </div>
     <div id="reload-message">RELOADING...</div>
     <script>
-
-        var w = window.innerWidth - 200;
-        var h = window.innerHeight - 200;
+        //variables
+        var w = window.innerWidth;
+        var h = window.innerHeight;
         var score = 0;
-        var ally = document.getElementById("ally");
-        var enemy = document.getElementById("enemy");
-        var reloadMessage = document.getElementById("reload-message");
         var isReloading = false;
-        var reloadTime = 1000;
+        var reloadTime = 2000;
         var setAmmo = 3;
         var ammo = 3;
+        var intervals = {};
+        var isPaused = false;
+
+        var ally = document.getElementById("ally");
+        var enemy = document.getElementById("enemy");
+        var enemyGold = document.getElementById("enemy-gold");
+        var reloadMessage = document.getElementById("reload-message");
         var element = document.documentElement;
 
         function targetShot(element){
-            if (isReloading){
+            if (isReloading || isPaused){
                 return;
             } else if (element.id === "enemy") {
                 score += 5;
+            } else if (element.id === "enemy-gold") {
+                score += 15;
             } else if (element.id === "ally") {
                 score -= 5;
             }
@@ -48,7 +55,7 @@
             }, reloadTime);
         }
         function shot(){
-            if (!isReloading && ammo > 0){
+            if (!isReloading && !isPaused && ammo > 0){
                 new Audio("gunshot.mp3").play();
                 ammo--;
                 document.getElementById("ammo").innerHTML = "ammo: " + ammo;
@@ -59,24 +66,44 @@
             }
         }
 
-        function movement(element){
-            var dx = 6;
-            let myInterval = setInterval(function(){
-                var x = parseInt(element.style.left);
-                var y = element.style.top;
+        function movement(element) {
+            if (!element.dx) {
+                element.dx = 1; // Done only once
+            }
+            if (!element.dy) {
+                element.dy = 1; // Done only once
+            }
 
-                if(x > w || x < 0) dx = -dx;
+            var elementId = element.id; // Unique ID for the element
+            intervals[elementId] = setInterval(function () {
+                var x = parseFloat(element.style.left);
+                var y = parseFloat(element.style.top);
+                var elementWidth = element.offsetWidth;
+                var elementHeight = element.offsetHeight;
 
-                element.style.left = x + dx + "px";
-            }, 20);
+                if (x + elementWidth > w || x < 0) element.dx = -element.dx;
+                if (y + elementHeight > h || y < 0) element.dy = -element.dy;
+
+                element.style.left = x + element.dx + "px";
+                element.style.top = y + element.dy + "px";
+            }, 1);
         }
+
+        function stopAllMovement() {
+            for (let key in intervals) {
+                clearInterval(intervals[key]); // Stop all intervals
+            }
+            isPaused = true;
+        }
+
         function spawn(element){
-            element.style.left = Math.floor(Math.random() * w) + "px";
-            element.style.top = Math.floor(Math.random() * h) + "px";
+            var elementWidth = element.offsetWidth;
+            element.style.left = Math.floor(Math.random() * (w - elementWidth)) + "px";
+            element.style.top = Math.floor(Math.random() * (h - elementWidth)) + "px";
         }
 
         document.addEventListener('keydown', function(event) {
-            if (event.key === 'f' || event.key === 'F') {
+            if (event.key === 'f' || event.key === 'F') { //Fullscreen
                 if (element.requestFullscreen) {
                 element.requestFullscreen();
             } else if (element.mozRequestFullScreen) { // Firefox
@@ -87,12 +114,25 @@
                 element.msRequestFullscreen();
             }
             }
+            else if (event.key === 'p' || event.key === 'P'){ //Pause
+                if (!isPaused){
+                    stopAllMovement();
+                }
+                else{
+                    movement(ally);
+                    movement(enemy);
+                    movement(enemyGold);
+                    isPaused = false
+                }
+            }
         });
 
         spawn(ally);
         spawn(enemy);
+        spawn(enemyGold);
         movement(ally);
         movement(enemy);
+        movement(enemyGold);
         document.getElementById("ammo").innerHTML = "ammo: " + ammo;
 
     </script>
