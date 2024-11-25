@@ -5,22 +5,24 @@
 <link rel="stylesheet" href="shooter.css">
 </head>
 <body onclick="shot()">
-<div>
-    <button id="start-button" onclick="startGame(event)">Start</button>
+<div id="start-button" onclick="startGame(event)">
+    <h1>START GAME</h1>
 </div>
 <div id="game-container">
     <div class="object" id="ally" onclick="targetShot(this)"></div>
     <div class="object" id="enemy" onclick="targetShot(this)"></div>
     <div class="object" id="enemy-gold" onclick="targetShot(this)"></div>
     <div id="upgrade-container">
-       <div class="upgrade-button" id="multiplyer">get more points/time from enemies</div>
-        <div class="upgrade-button" id="ammo-count">+1 bullet</div>
-        <div class="upgrade-button" id="reload-time">shorter reload time</div> 
+       <div class="upgrade-button" id="multiplyer" onclick="upgradeMultiplyer()">get more points/time from enemies</div>
+        <div class="upgrade-button" id="ammo-count" onclick="upgradeAmmo()">+1 bullet</div>
+        <div class="upgrade-button" id="reload-time" onclick="upgradeReload()">shorter reload time</div> 
+    </div>
+    <div id="upgrade-stats">
     </div>
     
     <div id="stats">
         <div id="score">score: 0</div>
-        <div id="ammo"></div>    
+        <div id="ammo"></div>
     </div>
     <div id="reload-message">RELOADING...</div>
 </div>
@@ -31,16 +33,18 @@
         var h = window.innerHeight;
         var score = 0;
         var isReloading = false;
-        var reloadTime = 2000;
-        var setAmmo = 3;
-        var ammo = 3;
+        var reloadTime = 4000;
+        var setAmmo = 1;
+        var ammo = 1;
         var intervals = {};
         var isPaused = false;
+        var multiplyer = 1;
 
         var ally = document.getElementById("ally");
         var enemy = document.getElementById("enemy");
         var enemyGold = document.getElementById("enemy-gold");
         var reloadMessage = document.getElementById("reload-message");
+        var upgradeStats = document.getElementById("upgrade-stats");
         var element = document.documentElement;
 
         function startGame(event){
@@ -54,8 +58,12 @@
             movement(ally);
             movement(enemy);
             movement(enemyGold);
-            document.getElementById("ammo").innerHTML = "ammo: " + ammo;
+            document.getElementById("ammo").innerHTML = "ammo: " + ammo + "/" + setAmmo;
             document.getElementById("start-button").style.display = "none";
+            var checkWindowSize = setInterval(function(){
+                w = window.innerWidth;
+                h = window.innerHeight;
+            },100)
         }
 
         document.addEventListener("click", function(event) { //hit detection
@@ -75,11 +83,11 @@
                     mouseY <= rect.bottom) {
                     //points for hit
                     if (obj.id === "enemy") {
-                        score += 5;
+                        score += 5 * multiplyer;
                     } else if (obj.id === "enemy-gold") {
-                        score += 15;
+                        score += 15 * multiplyer;
                     } else if (obj.id === "ally") {
-                        score -= 5;
+                        score -= 5 * multiplyer;
                     }
 
                     document.getElementById("score").innerHTML = "score: " + score;
@@ -94,7 +102,7 @@
             setTimeout(() => {
                 reloadMessage.style.display = "none";
                 ammo = setAmmo;
-                document.getElementById("ammo").innerHTML = "ammo: " + ammo;
+                document.getElementById("ammo").innerHTML = "ammo: " + ammo + "/" + setAmmo;
                 isReloading = false;
             }, reloadTime);
         }
@@ -102,7 +110,7 @@
             if (!isReloading && !isPaused && ammo > 0 && gameStarted === true){
                 new Audio("gunshot.mp3").play();
                 ammo--;
-                document.getElementById("ammo").innerHTML = "ammo: " + ammo;
+                document.getElementById("ammo").innerHTML = "ammo: " + ammo + "/" + setAmmo;
 
                 if (ammo === 0){
                     reload();
@@ -116,7 +124,7 @@
                 else element.dx = 1; // Done only once
             }
             if (!element.dy) {
-                if (element.id === "enemy-gold") element.dy = 1.7;
+                if (element.id === "enemy-gold") element.dy = 1.5;
                 else element.dy = 1; // Done only once
             }
 
@@ -140,20 +148,17 @@
                 clearInterval(intervals[ID]); // Stop all intervals
             }
             isPaused = true;
-            document.getElementById("multiplyer").style.display = "flex";
-            document.getElementById("ammo-count").style.display = "flex";
-            document.getElementById("reload-time").style.display = "flex";
             document.getElementById("upgrade-container").style.display = "flex";
             document.getElementById("stats").style.display = "none";
+            document.getElementById("upgrade-stats").style.display = "flex";
+            upgradeStats.innerHTML = "multiplyer: " + multiplyer + "X <br> max ammo: " + setAmmo + "<br> reload time: " + reloadTime + "ms";
         }
         function resumeAllMovement() {
             movement(ally);
             movement(enemy);
             movement(enemyGold);
-            document.getElementById("multiplyer").style.display = "none";
-            document.getElementById("ammo-count").style.display = "none";
-            document.getElementById("reload-time").style.display = "none";
             document.getElementById("upgrade-container").style.display = "none";
+            document.getElementById("upgrade-stats").style.display = "none";
             document.getElementById("stats").style.display = "block";
             isPaused = false
         }
@@ -162,6 +167,22 @@
             var elementWidth = element.offsetWidth;
             element.style.left = Math.floor(Math.random() * (w - elementWidth)) + "px";
             element.style.top = Math.floor(Math.random() * (h - elementWidth)) + "px";
+        }
+        function upgradeMultiplyer(){
+            multiplyer += 0.25;
+            console.log(multiplyer);
+            upgradeStats.innerHTML = "multiplyer: " + multiplyer + "X <br> max ammo: " + setAmmo + "<br> reload time: " + reloadTime + "ms";
+        }
+        function upgradeAmmo(){
+            setAmmo += 1;
+            console.log(setAmmo);
+            document.getElementById("ammo").innerHTML = "ammo: " + ammo + "/" + setAmmo;
+            upgradeStats.innerHTML = "multiplyer: " + multiplyer + "X <br> max ammo: " + setAmmo + "<br> reload time: " + reloadTime + "ms";
+        }
+        function upgradeReload(){
+            reloadTime = reloadTime * 0.85;
+            console.log(reloadTime);
+            upgradeStats.innerHTML = "multiplyer: " + multiplyer + "X <br> max ammo: " + setAmmo + "<br> reload time: " + reloadTime + "ms";
         }
 
         document.addEventListener('keydown', function(event) {
@@ -180,7 +201,7 @@
                 if (!isPaused) stopAllMovement();
                 else resumeAllMovement();
             }
-            else if (event.key === 'r' || event.key === 'R') reload(); //Reload after pressing R
+            else if ((event.key === 'r' || event.key === 'R') && !isPaused) reload(); //Reload after pressing R
         });
 
     </script>
