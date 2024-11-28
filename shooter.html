@@ -23,6 +23,7 @@
     <div id="stats">
         <div id="score">score: 0</div>
         <div id="ammo"></div>
+        <div id="time"></div>
     </div>
     <div id="reload-message">RELOADING...</div>
 </div>
@@ -39,6 +40,7 @@
         var intervals = {};
         var isPaused = false;
         var multiplyer = 1;
+        var time = 100;
 
         var ally = document.getElementById("ally");
         var enemy = document.getElementById("enemy");
@@ -64,6 +66,13 @@
                 w = window.innerWidth;
                 h = window.innerHeight;
             },100)
+            var checkWindowSize = setInterval(function(){
+                if(!isPaused) time -= 1;
+                document.getElementById("time").innerHTML = "time: " + time/10;
+                if (time === -1){
+                    alert("GAME OVER");
+                }
+            }, 100)
         }
 
         document.addEventListener("click", function(event) { //hit detection
@@ -84,10 +93,13 @@
                     //points for hit
                     if (obj.id === "enemy") {
                         score += 5 * multiplyer;
+                        time += 50;
                     } else if (obj.id === "enemy-gold") {
                         score += 15 * multiplyer;
+                        time += 50;
                     } else if (obj.id === "ally") {
                         score -= 5 * multiplyer;
+                        time += 50;
                     }
 
                     document.getElementById("score").innerHTML = "score: " + score;
