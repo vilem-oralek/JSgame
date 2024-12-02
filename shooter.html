@@ -10,13 +10,16 @@
 </div>
 <div id="game-container">
     <div class="object" id="ally" onclick="targetShot(this)"></div>
-    <div class="object" id="enemy" onclick="targetShot(this)"></div>
+    <div class="object" id="enemy-black1" onclick="targetShot(this)"></div>
     <div class="object" id="enemy-gold" onclick="targetShot(this)"></div>
+    <div class="object" id="enemy-black2" onclick="targetShot(this)"></div>
+    <div class="object" id="enemy-blue" onclick="targetShot(this)"></div>
     <div id="upgrade-container">
-       <div class="upgrade-button" id="multiplyer" onclick="upgradeMultiplyer()">get more points/time from enemies</div>
+       <div class="upgrade-button" id="multiplyer" onclick="upgradeMultiplyer()">Get more points/time from enemies</div>
         <div class="upgrade-button" id="ammo-count" onclick="upgradeAmmo()">+1 bullet</div>
-        <div class="upgrade-button" id="reload-time" onclick="upgradeReload()">shorter reload time</div> 
+        <div class="upgrade-button" id="reload-time" onclick="upgradeReload()">Shorter reload time</div> 
     </div>
+    <div id="game-over">GAME OVER</div>
     <div id="upgrade-stats">
     </div>
     
@@ -40,11 +43,14 @@
         var intervals = {};
         var isPaused = false;
         var multiplyer = 1;
-        var time = 100;
+        var time = 200;
+        var gameOver = false;
 
         var ally = document.getElementById("ally");
-        var enemy = document.getElementById("enemy");
+        var enemyBlack1 = document.getElementById("enemy-black1");
         var enemyGold = document.getElementById("enemy-gold");
+        var enemyBlack2 = document.getElementById("enemy-black2");
+        var enemyBlue = document.getElementById("enemy-blue");
         var reloadMessage = document.getElementById("reload-message");
         var upgradeStats = document.getElementById("upgrade-stats");
         var element = document.documentElement;
@@ -55,25 +61,50 @@
             document.getElementById("game-container").style.display = "block";
 
             spawn(ally);
-            spawn(enemy);
+            spawn(enemyBlack1);
+            spawn(enemyBlack2);
             spawn(enemyGold);
+            spawn(enemyBlue);
             movement(ally);
-            movement(enemy);
+            movement(enemyBlack1);
+            movement(enemyBlack2);
             movement(enemyGold);
+            movement(enemyBlue);
             document.getElementById("ammo").innerHTML = "ammo: " + ammo + "/" + setAmmo;
             document.getElementById("start-button").style.display = "none";
             var checkWindowSize = setInterval(function(){
                 w = window.innerWidth;
                 h = window.innerHeight;
-            },100)
+            },100)  
             var checkWindowSize = setInterval(function(){
                 if(!isPaused) time -= 1;
                 document.getElementById("time").innerHTML = "time: " + time/10;
                 if (time === -1){
-                    alert("GAME OVER");
+                    document.getElementById("game-over").style.display = "block";
+                    for (let ID in intervals) {
+                        clearInterval(intervals[ID]); // Stop all intervals
+                    }
+                    document.getElementById("stats").style.display = "none";
+                    enemyBlack1.style.display = "none";
+                    enemyBlack2.style.display = "none";
+                    enemyGold.style.display = "none";
+                    enemyBlue.style.display = "none";
+                    ally.style.display = "none";
+                    isPaused = true;
+                    gameOver = true;
                 }
             }, 100)
         }
+        // Create the crosshair element
+        const crosshair = document.createElement('div');
+        crosshair.className = 'crosshair';
+        document.body.appendChild(crosshair);
+
+        // Update crosshair position based on mouse movement
+        document.addEventListener('mousemove', (event) => {
+            crosshair.style.left = `${event.clientX - 16}px`; // Center crosshair on cursor
+            crosshair.style.top = `${event.clientY - 16}px`; 
+        });
 
         document.addEventListener("click", function(event) { //hit detection
             if (!gameStarted || isReloading || isPaused) return;
@@ -91,25 +122,33 @@
                     mouseY >= rect.top &&
                     mouseY <= rect.bottom) {
                     //points for hit
-                    if (obj.id === "enemy") {
-                        score += 5 * multiplyer;
-                        time += 50;
-                    } else if (obj.id === "enemy-gold") {
-                        score += 15 * multiplyer;
+                    if (obj.id === "enemy-black1") {
+                        score += 50 * multiplyer;
+                        time += 20;
+                    } else if (obj.id === "enemy-black2") {
+                        score += 50 * multiplyer;
+                        time += 20;
+                    }else if (obj.id === "enemy-blue") {
+                        score += 100 * multiplyer;
+                        time += 5;
+                    }else if (obj.id === "enemy-gold") {
+                        score += 500 * multiplyer;
                         time += 50;
                     } else if (obj.id === "ally") {
-                        score -= 5 * multiplyer;
-                        time += 50;
+                        score -= 30 * multiplyer;
+                        time -= 20;
                     }
 
                     document.getElementById("score").innerHTML = "score: " + score;
-                    spawn(obj); // Respawn the object
+                    spawn(obj);
                 }
             });
         });
 
         function reload() {
-            isReloading = true;
+            setTimeout(() => { //delay for the last shot to count
+                isReloading = true;
+            }, 10);
             reloadMessage.style.display = "block";
             setTimeout(() => {
                 reloadMessage.style.display = "none";
@@ -166,13 +205,17 @@
             upgradeStats.innerHTML = "multiplyer: " + multiplyer + "X <br> max ammo: " + setAmmo + "<br> reload time: " + reloadTime + "ms";
         }
         function resumeAllMovement() {
-            movement(ally);
-            movement(enemy);
-            movement(enemyGold);
-            document.getElementById("upgrade-container").style.display = "none";
-            document.getElementById("upgrade-stats").style.display = "none";
-            document.getElementById("stats").style.display = "block";
-            isPaused = false
+            if(!gameOver){
+                movement(ally);
+                movement(enemyBlack1);
+                movement(enemyBlack2);
+                movement(enemyBlue);
+                movement(enemyGold);
+                document.getElementById("upgrade-container").style.display = "none";
+                document.getElementById("upgrade-stats").style.display = "none";
+                document.getElementById("stats").style.display = "block";
+                isPaused = false
+            }
         }
 
         function spawn(element){
