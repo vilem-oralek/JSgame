@@ -14,20 +14,29 @@
     <div class="object" id="enemy-gold" onclick="targetShot(this)"></div>
     <div class="object" id="enemy-black2" onclick="targetShot(this)"></div>
     <div class="object" id="enemy-blue" onclick="targetShot(this)"></div>
-    <div id="upgrade-container">
-       <div class="upgrade-button" id="multiplyer" onclick="upgradeMultiplyer()">Get more points/time from enemies</div>
-        <div class="upgrade-button" id="ammo-count" onclick="upgradeAmmo()">+1 bullet</div>
-        <div class="upgrade-button" id="reload-time" onclick="upgradeReload()">Shorter reload time</div> 
-    </div>
+        <div id="upgrade-container">
+            <div class="upgrade-button" id="multiplyer" onclick="upgradeMultiplyer()">
+                Get more points/time from enemies
+                <div class="price" id="multiplyer-price">100</div>
+            </div>
+            <div class="upgrade-button" id="ammo-count" onclick="upgradeAmmo()">
+                +1 bullet
+                <div class="price" id="ammo-price">50</div>
+            </div>
+            <div class="upgrade-button" id="reload-time" onclick="upgradeReload()">
+                Shorter reload time
+                <div class="price" id="reload-price">75</div>
+            </div>
+        </div>
     <div id="game-over">GAME OVER</div>
-    <div id="upgrade-stats">
-    </div>
-    
+    <div id="upgrade-stats"></div>
+    <div id="upgrade-score"></div>
     <div id="stats">
         <div id="score">score: 0</div>
         <div id="ammo"></div>
         <div id="time"></div>
     </div>
+    <div id="notification"></div>
     <div id="reload-message">RELOADING...</div>
 </div>
     <script>
@@ -45,6 +54,9 @@
         var multiplyer = 1;
         var time = 200;
         var gameOver = false;
+        var multiplyerPrice = 100;
+        var ammoPrice = 50;
+        var reloadPrice = 75;
 
         var ally = document.getElementById("ally");
         var enemyBlack1 = document.getElementById("enemy-black1");
@@ -53,6 +65,7 @@
         var enemyBlue = document.getElementById("enemy-blue");
         var reloadMessage = document.getElementById("reload-message");
         var upgradeStats = document.getElementById("upgrade-stats");
+        var upgradeScore = document.getElementById("upgrade-score");
         var element = document.documentElement;
 
         function startGame(event){
@@ -201,7 +214,9 @@
             isPaused = true;
             document.getElementById("upgrade-container").style.display = "flex";
             document.getElementById("stats").style.display = "none";
-            document.getElementById("upgrade-stats").style.display = "flex";
+            upgradeStats.style.display = "flex";
+            upgradeScore.style.display = "block";
+            upgradeScore.innerHTML = "score: " + score;
             upgradeStats.innerHTML = "multiplyer: " + multiplyer + "X <br> max ammo: " + setAmmo + "<br> reload time: " + reloadTime + "ms";
         }
         function resumeAllMovement() {
@@ -212,7 +227,8 @@
                 movement(enemyBlue);
                 movement(enemyGold);
                 document.getElementById("upgrade-container").style.display = "none";
-                document.getElementById("upgrade-stats").style.display = "none";
+                upgradeStats.style.display = "none";
+                upgradeScore.style.display = "none";
                 document.getElementById("stats").style.display = "block";
                 isPaused = false
             }
@@ -223,21 +239,59 @@
             element.style.left = Math.floor(Math.random() * (w - elementWidth)) + "px";
             element.style.top = Math.floor(Math.random() * (h - elementWidth)) + "px";
         }
-        function upgradeMultiplyer(){
-            multiplyer += 0.25;
-            console.log(multiplyer);
-            upgradeStats.innerHTML = "multiplyer: " + multiplyer + "X <br> max ammo: " + setAmmo + "<br> reload time: " + reloadTime + "ms";
+        function upgradeMultiplyer() {
+            if (score >= multiplyerPrice) {
+                score -= multiplyerPrice;
+                multiplyer += 0.25;
+                multiplyerPrice = Math.floor(multiplyerPrice * 1.5); // Increase price
+                document.getElementById("multiplyer-price").innerText = multiplyerPrice;
+                document.getElementById("score").innerHTML = "score: " + score;
+                console.log(multiplyer);
+                updateUpgradeStats();
+            } else {
+                showNotification("Not enough score for this upgrade!");
+            }
         }
-        function upgradeAmmo(){
-            setAmmo += 1;
-            console.log(setAmmo);
-            document.getElementById("ammo").innerHTML = "ammo: " + ammo + "/" + setAmmo;
-            upgradeStats.innerHTML = "multiplyer: " + multiplyer + "X <br> max ammo: " + setAmmo + "<br> reload time: " + reloadTime + "ms";
+
+        function upgradeAmmo() {
+            if (score >= ammoPrice) {
+                score -= ammoPrice;
+                setAmmo += 1;
+                ammoPrice = Math.floor(ammoPrice * 1.5); // Increase price
+                document.getElementById("ammo-price").innerText = ammoPrice;
+                document.getElementById("score").innerHTML = "score: " + score;
+                console.log(setAmmo);
+                updateUpgradeStats();
+            } else {
+                showNotification("Not enough score for this upgrade!");
+            }
         }
-        function upgradeReload(){
-            reloadTime = reloadTime * 0.85;
-            console.log(reloadTime);
+
+        function upgradeReload() {
+            if (score >= reloadPrice) {
+                score -= reloadPrice;
+                reloadTime = Math.floor(reloadTime * 0.85);
+                reloadPrice = Math.floor(reloadPrice * 1.5); // Increase price
+                document.getElementById("reload-price").innerText = reloadPrice;
+                document.getElementById("score").innerHTML = "score: " + score;
+                console.log(reloadTime);
+                updateUpgradeStats();
+            } else {
+                showNotification("Not enough score for this upgrade!");
+            }
+        }
+        function updateUpgradeStats() {
             upgradeStats.innerHTML = "multiplyer: " + multiplyer + "X <br> max ammo: " + setAmmo + "<br> reload time: " + reloadTime + "ms";
+            upgradeScore.innerHTML = "Score: " + score;
+        }
+        function showNotification(message) {
+            const notification = document.getElementById("notification");
+            notification.innerText = message;
+            notification.style.display = "block";
+            
+            setTimeout(() => {
+                notification.style.display = "none";
+            }, 2000); // 2 seconds
         }
 
         document.addEventListener('keydown', function(event) {
