@@ -9,25 +9,28 @@
     <h1>START GAME</h1>
 </div>
 <div id="game-container">
+    <!-- nepřátelé na střílení = kolečka -->
     <div class="object" id="ally" onclick="targetShot(this)"></div>
     <div class="object" id="enemy-black1" onclick="targetShot(this)"></div>
     <div class="object" id="enemy-gold" onclick="targetShot(this)"></div>
     <div class="object" id="enemy-black2" onclick="targetShot(this)"></div>
     <div class="object" id="enemy-blue" onclick="targetShot(this)"></div>
-        <div id="upgrade-container">
-            <div class="upgrade-button" id="multiplyer" onclick="upgradeMultiplyer()">
-                Get more points/time from enemies
-                <div class="price" id="multiplyer-price">100</div>
-            </div>
-            <div class="upgrade-button" id="ammo-count" onclick="upgradeAmmo()">
-                +1 bullet
-                <div class="price" id="ammo-price">50</div>
-            </div>
-            <div class="upgrade-button" id="reload-time" onclick="upgradeReload()">
-                Shorter reload time
-                <div class="price" id="reload-price">75</div>
-            </div>
+    <!-- tlačítka na vylepšení při pauznuzí -->
+    <div id="upgrade-container">
+        <div class="upgrade-button" id="multiplyer" onclick="upgradeMultiplyer()">
+            Get more points/time from enemies
+            <div class="price" id="multiplyer-price">100</div>
         </div>
+        <div class="upgrade-button" id="ammo-count" onclick="upgradeAmmo()">
+            +1 bullet
+            <div class="price" id="ammo-price">50</div>
+        </div>
+        <div class="upgrade-button" id="reload-time" onclick="upgradeReload()">
+            Shorter reload time
+            <div class="price" id="reload-price">75</div>
+        </div>
+    </div>
+    <!-- texty do her - počet nábojů, skóre, ... -->
     <div id="game-over">GAME OVER</div>
     <div id="upgrade-stats"></div>
     <div id="upgrade-score"></div>
@@ -37,282 +40,8 @@
         <div id="time"></div>
     </div>
     <div id="notification"></div>
-    <div id="reload-message">RELOADING...</div>
+    <div id="reload-message"><span id="reload-text">RELOADING...</span></div>
 </div>
-    <script>
-        //variables
-        var gameStarted = false;
-        var w = window.innerWidth;
-        var h = window.innerHeight;
-        var score = 0;
-        var isReloading = false;
-        var reloadTime = 4000;
-        var setAmmo = 1;
-        var ammo = 1;
-        var intervals = {};
-        var isPaused = false;
-        var multiplyer = 1;
-        var time = 200;
-        var gameOver = false;
-        var multiplyerPrice = 100;
-        var ammoPrice = 50;
-        var reloadPrice = 75;
-
-        var ally = document.getElementById("ally");
-        var enemyBlack1 = document.getElementById("enemy-black1");
-        var enemyGold = document.getElementById("enemy-gold");
-        var enemyBlack2 = document.getElementById("enemy-black2");
-        var enemyBlue = document.getElementById("enemy-blue");
-        var reloadMessage = document.getElementById("reload-message");
-        var upgradeStats = document.getElementById("upgrade-stats");
-        var upgradeScore = document.getElementById("upgrade-score");
-        var element = document.documentElement;
-
-        function startGame(event){
-            event.stopPropagation(); //clicking on button won't make a gunshot sound
-            gameStarted = true;
-            document.getElementById("game-container").style.display = "block";
-
-            spawn(ally);
-            spawn(enemyBlack1);
-            spawn(enemyBlack2);
-            spawn(enemyGold);
-            spawn(enemyBlue);
-            movement(ally);
-            movement(enemyBlack1);
-            movement(enemyBlack2);
-            movement(enemyGold);
-            movement(enemyBlue);
-            document.getElementById("ammo").innerHTML = "ammo: " + ammo + "/" + setAmmo;
-            document.getElementById("start-button").style.display = "none";
-            var checkWindowSize = setInterval(function(){
-                w = window.innerWidth;
-                h = window.innerHeight;
-            },100)  
-            var checkWindowSize = setInterval(function(){
-                if(!isPaused) time -= 1;
-                document.getElementById("time").innerHTML = "time: " + time/10;
-                if (time === -1){
-                    document.getElementById("game-over").style.display = "block";
-                    for (let ID in intervals) {
-                        clearInterval(intervals[ID]); // Stop all intervals
-                    }
-                    document.getElementById("stats").style.display = "none";
-                    enemyBlack1.style.display = "none";
-                    enemyBlack2.style.display = "none";
-                    enemyGold.style.display = "none";
-                    enemyBlue.style.display = "none";
-                    ally.style.display = "none";
-                    isPaused = true;
-                    gameOver = true;
-                }
-            }, 100)
-        }
-        // Create the crosshair element
-        const crosshair = document.createElement('div');
-        crosshair.className = 'crosshair';
-        document.body.appendChild(crosshair);
-
-        // Update crosshair position based on mouse movement
-        document.addEventListener('mousemove', (event) => {
-            crosshair.style.left = `${event.clientX - 16}px`; // Center crosshair on cursor
-            crosshair.style.top = `${event.clientY - 16}px`; 
-        });
-
-        document.addEventListener("click", function(event) { //hit detection
-            if (!gameStarted || isReloading || isPaused) return;
-            //mouse coordinates
-            const mouseX = event.clientX;
-            const mouseY = event.clientY;
-
-            const objects = document.querySelectorAll(".object"); //get all objects
-            objects.forEach((obj) => {
-                const rect = obj.getBoundingClientRect(); // get object's position and size
-
-                if ( //check if click was in the object
-                    mouseX >= rect.left &&
-                    mouseX <= rect.right &&
-                    mouseY >= rect.top &&
-                    mouseY <= rect.bottom) {
-                    //points for hit
-                    if (obj.id === "enemy-black1") {
-                        score += 50 * multiplyer;
-                        time += 20;
-                    } else if (obj.id === "enemy-black2") {
-                        score += 50 * multiplyer;
-                        time += 20;
-                    }else if (obj.id === "enemy-blue") {
-                        score += 100 * multiplyer;
-                        time += 5;
-                    }else if (obj.id === "enemy-gold") {
-                        score += 500 * multiplyer;
-                        time += 50;
-                    } else if (obj.id === "ally") {
-                        score -= 30 * multiplyer;
-                        time -= 20;
-                    }
-
-                    document.getElementById("score").innerHTML = "score: " + score;
-                    spawn(obj);
-                }
-            });
-        });
-
-        function reload() {
-            setTimeout(() => { //delay for the last shot to count
-                isReloading = true;
-            }, 10);
-            reloadMessage.style.display = "block";
-            setTimeout(() => {
-                reloadMessage.style.display = "none";
-                ammo = setAmmo;
-                document.getElementById("ammo").innerHTML = "ammo: " + ammo + "/" + setAmmo;
-                isReloading = false;
-            }, reloadTime);
-        }
-        function shot(){
-            if (!isReloading && !isPaused && ammo > 0 && gameStarted === true){
-                new Audio("gunshot.mp3").play();
-                ammo--;
-                document.getElementById("ammo").innerHTML = "ammo: " + ammo + "/" + setAmmo;
-
-                if (ammo === 0){
-                    reload();
-                }
-            }
-        }
-
-        function movement(element) { //enemies movement
-            if (!element.dx) {
-                if (element.id === "enemy-gold") element.dx = 1.5;
-                else element.dx = 1; // Done only once
-            }
-            if (!element.dy) {
-                if (element.id === "enemy-gold") element.dy = 1.5;
-                else element.dy = 1; // Done only once
-            }
-
-            var elementId = element.id; // Unique ID for the element
-            intervals[elementId] = setInterval(function () {
-                var x = parseFloat(element.style.left);
-                var y = parseFloat(element.style.top);
-                var elementWidth = element.offsetWidth;
-                var elementHeight = element.offsetHeight;
-
-                if (x + elementWidth > w || x < 0) element.dx = -element.dx;
-                if (y + elementHeight > h || y < 0) element.dy = -element.dy;
-
-                element.style.left = x + element.dx + "px";
-                element.style.top = y + element.dy + "px";
-            }, 1);
-        }
-
-        function stopAllMovement() {
-            for (let ID in intervals) {
-                clearInterval(intervals[ID]); // Stop all intervals
-            }
-            isPaused = true;
-            document.getElementById("upgrade-container").style.display = "flex";
-            document.getElementById("stats").style.display = "none";
-            upgradeStats.style.display = "flex";
-            upgradeScore.style.display = "block";
-            upgradeScore.innerHTML = "score: " + score;
-            upgradeStats.innerHTML = "multiplyer: " + multiplyer + "X <br> max ammo: " + setAmmo + "<br> reload time: " + reloadTime + "ms";
-        }
-        function resumeAllMovement() {
-            if(!gameOver){
-                movement(ally);
-                movement(enemyBlack1);
-                movement(enemyBlack2);
-                movement(enemyBlue);
-                movement(enemyGold);
-                document.getElementById("upgrade-container").style.display = "none";
-                upgradeStats.style.display = "none";
-                upgradeScore.style.display = "none";
-                document.getElementById("stats").style.display = "block";
-                isPaused = false
-            }
-        }
-
-        function spawn(element){
-            var elementWidth = element.offsetWidth;
-            element.style.left = Math.floor(Math.random() * (w - elementWidth)) + "px";
-            element.style.top = Math.floor(Math.random() * (h - elementWidth)) + "px";
-        }
-        function upgradeMultiplyer() {
-            if (score >= multiplyerPrice) {
-                score -= multiplyerPrice;
-                multiplyer += 0.25;
-                multiplyerPrice = Math.floor(multiplyerPrice * 1.5); // Increase price
-                document.getElementById("multiplyer-price").innerText = multiplyerPrice;
-                document.getElementById("score").innerHTML = "score: " + score;
-                console.log(multiplyer);
-                updateUpgradeStats();
-            } else {
-                showNotification("Not enough score for this upgrade!");
-            }
-        }
-
-        function upgradeAmmo() {
-            if (score >= ammoPrice) {
-                score -= ammoPrice;
-                setAmmo += 1;
-                ammoPrice = Math.floor(ammoPrice * 1.5); // Increase price
-                document.getElementById("ammo-price").innerText = ammoPrice;
-                document.getElementById("score").innerHTML = "score: " + score;
-                console.log(setAmmo);
-                updateUpgradeStats();
-            } else {
-                showNotification("Not enough score for this upgrade!");
-            }
-        }
-
-        function upgradeReload() {
-            if (score >= reloadPrice) {
-                score -= reloadPrice;
-                reloadTime = Math.floor(reloadTime * 0.85);
-                reloadPrice = Math.floor(reloadPrice * 1.5); // Increase price
-                document.getElementById("reload-price").innerText = reloadPrice;
-                document.getElementById("score").innerHTML = "score: " + score;
-                console.log(reloadTime);
-                updateUpgradeStats();
-            } else {
-                showNotification("Not enough score for this upgrade!");
-            }
-        }
-        function updateUpgradeStats() {
-            upgradeStats.innerHTML = "multiplyer: " + multiplyer + "X <br> max ammo: " + setAmmo + "<br> reload time: " + reloadTime + "ms";
-            upgradeScore.innerHTML = "Score: " + score;
-        }
-        function showNotification(message) {
-            const notification = document.getElementById("notification");
-            notification.innerText = message;
-            notification.style.display = "block";
-            
-            setTimeout(() => {
-                notification.style.display = "none";
-            }, 2000); // 2 seconds
-        }
-
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'f' || event.key === 'F') { //Fullscreen after pressing F
-                if (element.requestFullscreen) {
-                element.requestFullscreen();
-            } else if (element.mozRequestFullScreen) { // Firefox
-                element.mozRequestFullScreen();
-            } else if (element.webkitRequestFullscreen) { // Chrome, Safari and Opera
-                element.webkitRequestFullscreen();
-            } else if (element.msRequestFullscreen) { // IE/Edge
-                element.msRequestFullscreen();
-            }
-            }
-            else if ((event.key === 'p' || event.key === 'P') && gameStarted == true){ //Pause after pressing P
-                if (!isPaused) stopAllMovement();
-                else resumeAllMovement();
-            }
-            else if ((event.key === 'r' || event.key === 'R') && !isPaused) reload(); //Reload after pressing R
-        });
-
-    </script>
+    <script src="sctripts.js"></script>
 </body>
 </html>
