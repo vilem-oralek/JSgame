@@ -5,9 +5,11 @@
 <link rel="stylesheet" href="shooter.css">
 </head>
 <body onclick="shot()">
+
 <div id="start-button" onclick="startGame(event)">
     <h1>START GAME</h1>
 </div>
+<div id="tutorial">"F" - fullscreen <br> "P" - pause/upgrade <br> "R" - reload <br> black: 50p, 1s <br> black: 25p, 3s <br> gold: 500p, 5s <br> white: -100p, -30p</div>
 <div id="game-container">
     <!-- nepřátelé na střílení = kolečka -->
     <div class="object" id="ally" onclick="targetShot(this)"></div>

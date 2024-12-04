@@ -185,3 +185,17 @@ body{
     border-radius: 10px;
     padding: 5px;
 }
+#tutorial{
+    padding: 5px;
+    position: absolute;
+    top: 75%;
+    left: 50%;
+    width: fit-content;
+    max-width: 50%;
+    height: fit-content;
+    text-align: center;
+    font-size: 25px;
+    transform: translate(-50%, -50%);
+    background-color: rgba(240, 248, 255, 0.8);
+    border-radius: 10px;
+}

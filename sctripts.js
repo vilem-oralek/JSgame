@@ -33,6 +33,7 @@ function startGame(event){
     gameStarted = true;
     document.getElementById("game-container").style.display = "block"; // zobrazení hry
     document.getElementById("start-button").style.display = "none";
+    document.getElementById("tutorial").style.display = "none";
     // zobrazení a spuštění pohybu nepřátel
     spawn(ally);
     spawn(enemyBlack1);
